@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <!-- Required meta tags-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Colorlib Templates">
+    <meta name="author" content="Colorlib">
+    <meta name="keywords" content="Colorlib Templates">
+
+    <!-- Title Page-->
+    <title>Formulario</title>
+
+    <!-- Icons font CSS-->
+    <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
+    <link href="vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
+    <!-- Font special for pages-->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Vendor CSS-->
+    <link href="vendor/select2/select2.min.css" rel="stylesheet" media="all">
+    <link href="vendor/datepicker/daterangepicker.css" rel="stylesheet" media="all">
+
+    <!-- Main CSS-->
+    <link href="css/form1.css" rel="stylesheet" media="all">
+</head>
+
+<body>
+    <div class="page-wrapper bg-gra-02 p-t-130 p-b-100 font-poppins">
+        <div class="wrapper wrapper--w680">
+            <div class="card card-4">
+                <div class="card-body">
+                    <h2 class="title">Buenas!</h2>
+                    <form method="POST">
+                        <div class="row row-space">
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <label class="label">Nombre</label>
+                                    <input class="input--style-4" type="text" name="nombre" id="nombre" required>
+                                </div>
+                            </div>
+							<div class="col-2">
+                                <div class="input-group">
+                                    <label class="label">Sector</label>
+                                    <input class="input--style-4" type="text" name="sector" id="sector"required>
+                                </div>
+                            </div>
+                        </div>
+                           
+                     
+                        <div class="input-group ">
+                            <label class="label">Nivel Escolar</label>
+                            <div class="rs-select2 js-select-simple select--no-search">
+                                <select name="nivel_esc" id="nivel_esc" required>
+                                    <option disabled="disabled">Seleccione su Nivel Escolar</option>
+                                    <option>Basico</option>
+                                    <option>Medio</option>
+                                    <option>Universitario</option>
+									<option>Post-Grado</option>
+									<option>Doctorado</option>
+                                </select>
+                                <div class="select-dropdown"></div>
+                            </div>
+                        </div>
+                        <div class="p-t-15">
+                            <button class="btn btn--radius-2 btn--blue" type="submit" onclick="agregarFormulario()">Enviar</button>
+                            <button class="btn btn--radius-2 btn--blue" onclick="history.back()">Regresar</button>
+                        </div>
+                    </form>
+                    <button  class="btn btn--radius-2 btn--blue" onclick="listarDatos()"> Listar datos </button>
+                    <div id="listaFormularios" ></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jquery JS-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <!-- Vendor JS-->
+    <script src="vendor/select2/select2.min.js"></script>
+    <script src="vendor/datepicker/moment.min.js"></script>
+    <script src="vendor/datepicker/daterangepicker.js"></script>
+
+    <!-- Main JS-->
+    <script src="js/global.js"></script>
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootstrap.min.js" ></script>
+
+
+
+    <!-- IndexDB -->
+<script>
+
+    //dependiendo el navegador busco la referencia del objeto.
+    var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB
+
+    //indicamos el nombre y la versión
+    var dataBase = indexedDB.open("programacion_web", 1);
+
+
+    //se ejecuta la primera vez que se crea la estructura
+    //o se cambia la versión de la base de datos.
+    dataBase.onupgradeneeded = function (e) {
+        console.log("Creando la estructura de la tabla");
+
+        //obteniendo la conexión activa
+        active = dataBase.result;
+
+        //creando la colección:
+        //En este caso, la colección, tendrá un ID autogenerado.
+        var formularios = active.createObjectStore("formularios", { keyPath : 'nombre', autoIncrement : false });
+
+
+        //creando los indices. (Dado por el nombre, campo y opciones)
+        formularios.createIndex('por_id', 'id', {unique : false});
+
+    };
+
+    //El evento que se dispara una vez, lo
+    dataBase.onsuccess = function (e) {
+        console.log('Proceso ejecutado de forma correctamente');
+    };
+
+    dataBase.onerror = function (e) {
+        console.error('Error en el proceso: '+e.target.errorCode);
+    };
+
+
+
+    function agregarFormulario() {
+        var dbActiva = dataBase.result; //Nos retorna una referencia al IDBDatabase.
+
+        //Para realizar una operación de agreagr, actualización o borrar.
+        // Es necesario abrir una transacción e indicar un modo: readonly, readwrite y versionchange
+        var transaccion = dbActiva.transaction(["formularios"], "readwrite");
+
+        //Manejando los errores.
+        transaccion.onerror = function (e) {
+            alert(request.error.name + '\n\n' + request.error.message);
+        };
+
+        transaccion.oncomplete = function (e) {
+            document.querySelector("#nombre").value = '';
+            alert('Objeto agregado correctamente');
+        };
+
+        //abriendo la colección de datos que estaremos usando.
+        var formularios = transaccion.objectStore("formularios");
+
+        //Para agregar se puede usar add o put, el add requiere que no exista
+        // el objeto.
+        var request = formularios.put({
+            nombre: document.querySelector("#nombre").value,
+            sector: document.querySelector("#sector").value,
+            nivel_esc: document.querySelector("#nivel_esc").value
+        });
+
+        request.onerror = function (e) {
+            var mensaje = "Error: "+e.target.errorCode;
+            console.error(mensaje);
+            alert(mensaje)
+        };
+
+        request.onsuccess = function (e) {
+            console.log("Datos Procesado con exito");
+            document.querySelector("#nombre").value = "";
+            document.querySelector("#sector").value = "";
+            document.querySelector("#nivel_esc").value = "";
+        };
+
+
+    }
+
+
+    function listarDatos() {
+        //por defecto si no lo indico el tipo de transacción será readonly
+        var data = dataBase.result.transaction(["formularios"]);
+        var formularios = data.objectStore("formularios");
+        var contador = 0;
+        var formularios_recuperados=[];
+
+        //abriendo el cursor.
+        formularios.openCursor().onsuccess=function(e) {
+            //recuperando la posicion del cursor
+            var cursor = e.target.result;
+            if(cursor){
+                contador++;
+                //recuperando el objeto.
+                formularios_recuperados.push(cursor.value);
+
+                //Función que permite seguir recorriendo el cursor.
+                cursor.continue();
+
+            }else {
+                console.log("La cantidad de registros recuperados es: "+contador);
+            }
+        };
+
+        //Una vez que se realiza la operación llamo la impresión.
+        data.oncomplete = function () {
+            imprimirTabla(formularios_recuperados);
+        }
+
+    }
+    function imprimirTabla(lista_formularios) {
+        //creando la tabla...
+        var tabla = document.createElement("table");
+        var filaTabla = tabla.insertRow();
+        filaTabla.insertCell().textContent = "Nombre";
+        filaTabla.insertCell().textContent = "Sector";
+        filaTabla.insertCell().textContent = "Nivel Escolar";
+
+        for (var key in lista_formularios) {
+            //
+            filaTabla = tabla.insertRow();
+            filaTabla.insertCell().textContent = ""+lista_formularios[key].nombre;
+            filaTabla.insertCell().textContent = ""+lista_formularios[key].sector;
+            filaTabla.insertCell().textContent = ""+lista_formularios[key].nivel_esc;
+        }
+
+        document.getElementById("listaFormularios").innerHTML="";
+        document.getElementById("listaFormularios").appendChild(tabla);
+    }
+
+
+
+
+</script>
+
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+
+</html>
+<!-- end document-->

@@ -1,0 +1,12 @@
+CACHE MANIFEST
+
+CACHE:
+/publico
+
+NETWORK:
+/
+/Formulario
+/auth/*
+
+FALLBACK:
+/ /offline.html
