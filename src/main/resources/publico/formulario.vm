@@ -65,7 +65,7 @@
                         </div>
                         <div class="p-t-15">
                             <button class="btn btn--radius-2 btn--blue" type="submit" onclick="agregarFormulario()">Enviar</button>
-                            <button class="btn btn--radius-2 btn--blue" onclick="history.back()">Regresar</button>
+                            <a class="btn btn--radius-2 btn--blue" href="/">Regresar</a>
                         </div>
                     </form>
                     <button  class="btn btn--radius-2 btn--blue" onclick="listarDatos()"> Listar datos </button>
